@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,18 +23,12 @@
         .navbar-custom {
             background-color: #0a0a0a;
             border-bottom: 2px solid var(--gold);
+            padding: 12px 0;
         }
         .navbar-brand { 
             font-weight: 700; 
             color: var(--gold) !important; 
-            font-size: 1.5rem;
-        }
-        .nav-link {
-            color: #d1d1d1 !important;
-            transition: color 0.3s;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: var(--gold) !important;
+            font-size: 1.6rem;
         }
         .hero-banner { 
             background: linear-gradient(135deg, #4a0000 0%, #800000 50%, #1a0000 100%); 
@@ -69,19 +64,27 @@
             color: #000;
             font-weight: 700;
             border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
         .btn-gold:hover {
             background-color: #b89628;
             color: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
         .btn-outline-gold {
             border: 1px solid var(--gold);
             color: var(--gold);
             font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
         .btn-outline-gold:hover {
             background-color: var(--gold);
             color: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
         }
     </style>
 </head>
@@ -90,14 +93,18 @@
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
         <a class="navbar-brand" href="index.php"><i class="fa-solid fa-graduation-cap me-2"></i>CampusPulse</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active" href="index.php">Events Catalog</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">My Registrations</a></li>
-            </ul>
+            <div class="ms-auto d-flex gap-2">
+                <a href="index.php" class="btn btn-gold text-decoration-none">
+                    <i class="fa-solid fa-calendar-days me-2"></i>Events Catalog
+                </a>
+                <a href="#" class="btn btn-outline-gold text-decoration-none">
+                    <i class="fa-solid fa-user-check me-2"></i>My Registrations
+                </a>
+            </div>
         </div>
     </div>
 </nav>
