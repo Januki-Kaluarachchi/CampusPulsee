@@ -101,9 +101,9 @@
                 <a href="index.php" class="btn btn-gold text-decoration-none">
                     <i class="fa-solid fa-calendar-days me-2"></i>Events Catalog
                 </a>
-                <a href="#" class="btn btn-outline-gold text-decoration-none">
-                    <i class="fa-solid fa-user-check me-2"></i>My Registrations
-                </a>
+                <a href="my_registrations.php" class="btn btn-outline-gold text-decoration-none">
+    <i class="fa-solid fa-user-check me-2"></i>My Registrations
+     </a>
             </div>
         </div>
     </div>
