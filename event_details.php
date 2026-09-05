@@ -23,24 +23,26 @@ if (!$event) {
     exit;
 }
 
-// 2. Fetch MongoDB Content (Agenda & Speakers)
+// 2. Fetch MongoDB Content (Agenda & Speakers) safely if connection exists
 $mongo_content = null;
 $discussions = [];
 
-try {
-    $filter = ['oracle_event_id' => $event_id];
-    $query = new MongoDB\Driver\Query($filter);
-    
-    $mongo_content_cursor = $mongo_manager->executeQuery('campuspulse_nosql.event_content', $query);
-    $content_arr = $mongo_content_cursor->toArray();
-    if (!empty($content_arr)) {
-        $mongo_content = $content_arr[0];
-    }
+if (isset($mongo_manager) && $mongo_manager !== null) {
+    try {
+        $filter = ['oracle_event_id' => $event_id];
+        $query = new MongoDB\Driver\Query($filter);
+        
+        $mongo_content_cursor = $mongo_manager->executeQuery('campuspulse_nosql.event_content', $query);
+        $content_arr = $mongo_content_cursor->toArray();
+        if (!empty($content_arr)) {
+            $mongo_content = $content_arr[0];
+        }
 
-    $thread_cursor = $mongo_manager->executeQuery('campuspulse_nosql.discussion_threads', $query);
-    $discussions = $thread_cursor->toArray();
-} catch (Exception $e) {
-    // Fallback if Mongo execution hits a minor issue
+        $thread_cursor = $mongo_manager->executeQuery('campuspulse_nosql.discussion_threads', $query);
+        $discussions = $thread_cursor->toArray();
+    } catch (Exception $e) {
+        // Suppress any mongo runtime exception
+    }
 }
 ?>
 
@@ -108,18 +110,18 @@ try {
         <!-- Sidebar / Registration Form -->
         <div class="col-lg-4">
             <div class="card card-custom p-4 text-center sticky-top" style="top: 20px;">
-                <h4 class="fw-bold text-gold mb-3">Reserve Your Spot</h4>
-                <p class="text-secondary small">Instant booking via PL/SQL stored procedure backend validation.</p>
-                
-                <form action="process_registration.php" method="POST">
-                    <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
-                    <div class="mb-3">
-                        <label class="form-label text-light small">Student ID</label>
-                        <input type="number" name="student_id" class="form-control bg-dark text-white border-secondary" placeholder="e.g., 103" required>
-                    </div>
-                    <button type="submit" class="btn btn-gold w-100 py-2">Register Now</button>
-                </form>
-            </div>
+    <h4 class="fw-bold text-gold mb-3">Reserve Your Spot</h4>
+    <p class="text-secondary small">Enter your Student ID to secure your seat instantly.</p>
+    
+    <form action="process_registration.php" method="POST">
+        <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+        <div class="mb-3 text-start">
+            <label class="form-label text-light small">Student ID</label>
+            <input type="number" name="student_id" class="form-control bg-dark text-white border-secondary" placeholder="e.g., 101" required>
+        </div>
+        <button type="submit" class="btn btn-gold w-100 py-2">Register Now</button>
+    </form>
+</div>
         </div>
     </div>
 </div>
