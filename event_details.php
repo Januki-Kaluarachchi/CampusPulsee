@@ -109,19 +109,40 @@ if (isset($mongo_manager) && $mongo_manager !== null) {
 
         <!-- Sidebar / Registration Form -->
         <div class="col-lg-4">
-            <div class="card card-custom p-4 text-center sticky-top" style="top: 20px;">
-    <h4 class="fw-bold text-gold mb-3">Reserve Your Spot</h4>
-    <p class="text-secondary small">Enter your Student ID to secure your seat instantly.</p>
-    
-    <form action="process_registration.php" method="POST">
-        <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
-        <div class="mb-3 text-start">
-            <label class="form-label text-light small">Student ID</label>
-            <input type="number" name="student_id" class="form-control bg-dark text-white border-secondary" placeholder="e.g., 101" required>
-        </div>
-        <button type="submit" class="btn btn-gold w-100 py-2">Register Now</button>
-    </form>
-</div>
+            <div class="card card-custom p-4 sticky-top" style="top: 20px;">
+                <h4 class="fw-bold text-gold mb-3 text-center">Reserve Your Spot</h4>
+                
+                <form action="process_registration.php" method="POST">
+                    <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+
+                    <div class="mb-3">
+                        <label class="form-label text-light small">Student ID / Index No</label>
+                        <input type="number" name="student_id" class="form-control bg-dark text-white border-secondary" placeholder="e.g., 106" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light small">First Name</label>
+                        <input type="text" name="first_name" class="form-control bg-dark text-white border-secondary" placeholder="John" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light small">Last Name</label>
+                        <input type="text" name="last_name" class="form-control bg-dark text-white border-secondary" placeholder="Doe">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light small">Email Address</label>
+                        <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="john@campus.lk" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-light small">Department</label>
+                        <input type="text" name="department" class="form-control bg-dark text-white border-secondary" placeholder="Software Engineering">
+                    </div>
+
+                    <button type="submit" class="btn btn-gold w-100 py-2 mt-2">Confirm Registration</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
