@@ -99,13 +99,14 @@ $report_sql = "SELECT e.event_id, e.title, c.club_name, v.venue_name, e.ticket_p
 $stmt = oci_parse($conn, $report_sql);
 oci_execute($stmt);
 
-// 2. Fetch Recent Registrations Activity (Oracle Query)
+// 2. Fetch Recent Registrations Activity (Oracle Query - TOP 5 RECENT ONLY)
 $recent_sql = "SELECT r.registration_id, u.student_id, u.first_name || ' ' || u.last_name AS student_name, 
                       e.title AS event_title, r.registration_date, r.status
                FROM REGISTRATIONS r
                JOIN USERS u ON r.student_id = u.student_id
                JOIN EVENTS e ON r.event_id = e.event_id
-               ORDER BY r.registration_id DESC";
+               ORDER BY r.registration_id DESC
+               FETCH FIRST 5 ROWS ONLY";
 $recent_stmt = oci_parse($conn, $recent_sql);
 oci_execute($recent_stmt);
 ?>
@@ -186,9 +187,12 @@ oci_execute($recent_stmt);
         </div>
     </div>
 
-    <!-- Recent Student Registrations Activity Log -->
+    <!-- Recent Student Registrations Activity Log (Top 5) -->
     <div class="card card-custom p-4">
-        <h4 class="fw-bold text-gold mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Registration Logs</h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold text-gold mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Registration Logs</h4>
+            <span class="badge bg-secondary">Latest 5 Registrations</span>
+        </div>
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle border-secondary mb-0">
                 <thead>
