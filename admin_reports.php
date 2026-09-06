@@ -1,8 +1,64 @@
 <?php
+session_start();
 require_once 'config/oracle_db.php';
+
+// Define Admin Password
+define('ADMIN_PASSWORD', 'admin123');
+
+// Handle Password Submission
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_pass'])) {
+    $input_pass = trim($_POST['admin_pass']);
+    if ($input_pass === ADMIN_PASSWORD) {
+        $_SESSION['is_admin_logged_in'] = true;
+    } else {
+        $error = 'Incorrect Password! Access Denied.';
+    }
+}
+
+// Handle Logout
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    unset($_SESSION['is_admin_logged_in']);
+    header('Location: admin_reports.php');
+    exit;
+}
+
 require_once 'views/header.php';
 
-// 1. Fetch Total Metrics
+// If NOT logged in, display Password Login Form
+if (!isset($_SESSION['is_admin_logged_in']) || $_SESSION['is_admin_logged_in'] !== true):
+?>
+
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card card-custom p-4 shadow-lg" style="max-width: 450px; width: 100%;">
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-user-shield fa-3x text-gold mb-3"></i>
+            <h3 class="fw-bold text-gold">Admin Authentication</h3>
+            <p class="text-secondary small">Please enter the password to access Oracle system reports.</p>
+        </div>
+
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger py-2 text-center small" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="admin_reports.php" method="POST">
+            <div class="mb-3">
+                <label class="form-label text-light small">Admin Password</label>
+                <input type="password" name="admin_pass" class="form-control bg-dark text-white border-secondary py-2" placeholder="Enter password" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-gold w-100 py-2 font-weight-bold">Unlock Reports</button>
+        </form>
+    </div>
+</div>
+
+<?php 
+require_once 'views/footer.php';
+exit; 
+endif; // End Auth Check
+
+// --- IF AUTHENTICATED: FETCH REPORTS ---
 $total_students = 0;
 $total_events = 0;
 $total_regs = 0;
@@ -22,7 +78,7 @@ oci_execute($q3);
 if ($r = oci_fetch_array($q3, OCI_ASSOC)) { $total_regs = $r['CNT']; }
 oci_free_statement($q3);
 
-// 2. Fetch Event Registration Breakdown
+// Fetch Event Registration Breakdown
 $report_sql = "SELECT e.event_id, e.title, c.club_name, v.venue_name, e.ticket_price,
                       COUNT(r.registration_id) AS total_registrations
                FROM EVENTS e
@@ -37,9 +93,12 @@ oci_execute($stmt);
 ?>
 
 <div class="container my-5">
-    <div class="mb-4 text-center">
-        <h2 class="fw-bold text-gold"><i class="fa-solid fa-chart-line me-2"></i>Admin Reports & Analytics</h2>
-        <p class="text-secondary">System-wide performance overview from Oracle Database</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-gold mb-1"><i class="fa-solid fa-chart-line me-2"></i>Admin Reports & Analytics</h2>
+            <p class="text-secondary mb-0">System-wide performance overview from Oracle Database</p>
+        </div>
+        <a href="admin_reports.php?action=logout" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-right-from-bracket me-1"></i> Lock Reports</a>
     </div>
 
     <!-- Overview Stats Cards -->
