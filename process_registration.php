@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = oci_fetch_array($check_stmt, OCI_ASSOC);
         
         if ($row['CNT'] == 0) {
-            // Insert User Profile first
+            // Insert User Profile first into USERS table
             $ins_sql = "INSERT INTO campuspulse_user.USERS (student_id, first_name, last_name, email, department, year_of_study) 
                         VALUES (:sid, :fname, :lname, :email, :dept, 1)";
             $ins_stmt = oci_parse($conn, $ins_sql);
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             oci_bind_by_name($ins_stmt, ':lname', $last_name);
             oci_bind_by_name($ins_stmt, ':email', $email);
             oci_bind_by_name($ins_stmt, ':dept', $department);
-            @oci_execute($ins_stmt);
+            oci_execute($ins_stmt);
             oci_free_statement($ins_stmt);
         }
         oci_free_statement($check_stmt);
@@ -48,10 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         oci_execute($stmt);
 
+        // Explicitly Commit transaction to permanently write data to Oracle Database
+        oci_commit($conn);
+
         oci_free_statement($stmt);
         oci_close($conn);
 
-        // Redirect to My Registrations page to show registered cards
+        // Redirect to My Registrations page to show registered card
         header("Location: my_registrations.php?student_id=" . $student_id);
         exit;
     }
