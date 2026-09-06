@@ -86,24 +86,36 @@
             color: #000;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
         }
+        .text-gold {
+            color: var(--gold) !important;
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-custom">
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="index.php"><i class="fa-solid fa-graduation-cap me-2"></i>CampusPulse</a>
+        <a class="navbar-brand" href="index.php">
+            <i class="fa-solid fa-graduation-cap me-2"></i>CampusPulse
+        </a>
         <button class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="ms-auto d-flex gap-2">
+            <div class="ms-auto d-flex flex-wrap gap-2 mt-2 mt-lg-0">
                 <a href="index.php" class="btn btn-gold text-decoration-none">
                     <i class="fa-solid fa-calendar-days me-2"></i>Events Catalog
                 </a>
                 <a href="my_registrations.php" class="btn btn-outline-gold text-decoration-none">
-    <i class="fa-solid fa-user-check me-2"></i>My Registrations
-     </a>
+                    <i class="fa-solid fa-user-check me-2"></i>My Registrations
+                </a>
+                <a href="forums.php" class="btn btn-outline-gold text-decoration-none">
+                    <i class="fa-solid fa-comments me-2"></i>Forums
+                </a>
+                <a href="admin_reports.php" class="btn btn-outline-gold text-decoration-none">
+                    <i class="fa-solid fa-chart-pie me-2"></i>Reports
+                </a>
             </div>
         </div>
     </div>
