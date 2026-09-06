@@ -19,7 +19,7 @@ if (isset($mongo_manager) && $mongo_manager !== null) {
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-gold mb-1"><i class="fa-solid fa-comments me-2"></i>Campus Discussions & Q&A</h2>
-            <p class="text-secondary mb-0">Community interactions powered by MongoDB NoSQL</p>
+            <p class="text-secondary mb-0">Join discussions and ask questions about upcoming events</p>
         </div>
     </div>
 
@@ -52,8 +52,10 @@ if (isset($mongo_manager) && $mongo_manager !== null) {
             <?php endforeach; ?>
         <?php else: ?>
             <div class="col-12">
-                <div class="alert alert-dark text-center border-secondary text-light">
-                    No active forum discussions found in MongoDB.
+                <div class="card card-custom p-4 text-center border-secondary">
+                    <i class="fa-regular fa-comments fa-3x text-gold mb-3"></i>
+                    <h5 class="text-white fw-bold">No Forum Discussions Yet</h5>
+                    <p class="text-secondary mb-0">There are currently no active discussion topics available for campus events.</p>
                 </div>
             </div>
         <?php endif; ?>
