@@ -58,10 +58,11 @@ require_once 'views/footer.php';
 exit; 
 endif; // End Auth Check
 
-// --- IF AUTHENTICATED: FETCH REPORTS ---
+// --- FETCH SYSTEM METRICS FROM ORACLE ---
 $total_students = 0;
 $total_events = 0;
 $total_regs = 0;
+$total_revenue = 0.00;
 
 $q1 = oci_parse($conn, "SELECT COUNT(*) AS CNT FROM USERS");
 oci_execute($q1);
@@ -78,7 +79,15 @@ oci_execute($q3);
 if ($r = oci_fetch_array($q3, OCI_ASSOC)) { $total_regs = $r['CNT']; }
 oci_free_statement($q3);
 
-// Fetch Event Registration Breakdown
+// Calculate Total Revenue from Paid Registrations
+$q4 = oci_parse($conn, "SELECT NVL(SUM(e.ticket_price), 0) AS REVENUE 
+                       FROM REGISTRATIONS r 
+                       JOIN EVENTS e ON r.event_id = e.event_id");
+oci_execute($q4);
+if ($r = oci_fetch_array($q4, OCI_ASSOC)) { $total_revenue = $r['REVENUE']; }
+oci_free_statement($q4);
+
+// 1. Fetch Event Registration Breakdown (Oracle Query)
 $report_sql = "SELECT e.event_id, e.title, c.club_name, v.venue_name, e.ticket_price,
                       COUNT(r.registration_id) AS total_registrations
                FROM EVENTS e
@@ -87,9 +96,18 @@ $report_sql = "SELECT e.event_id, e.title, c.club_name, v.venue_name, e.ticket_p
                LEFT JOIN REGISTRATIONS r ON e.event_id = r.event_id
                GROUP BY e.event_id, e.title, c.club_name, v.venue_name, e.ticket_price
                ORDER BY e.event_id ASC";
-
 $stmt = oci_parse($conn, $report_sql);
 oci_execute($stmt);
+
+// 2. Fetch Recent Registrations Activity (Oracle Query)
+$recent_sql = "SELECT r.registration_id, u.student_id, u.first_name || ' ' || u.last_name AS student_name, 
+                      e.title AS event_title, r.registration_date, r.status
+               FROM REGISTRATIONS r
+               JOIN USERS u ON r.student_id = u.student_id
+               JOIN EVENTS e ON r.event_id = e.event_id
+               ORDER BY r.registration_id DESC";
+$recent_stmt = oci_parse($conn, $recent_sql);
+oci_execute($recent_stmt);
 ?>
 
 <div class="container my-5">
@@ -103,31 +121,38 @@ oci_execute($stmt);
 
     <!-- Overview Stats Cards -->
     <div class="row g-4 mb-5">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card card-custom p-3 text-center border-start border-4 border-warning">
                 <i class="fa-solid fa-users fa-2x text-gold mb-2"></i>
-                <h6 class="text-secondary mb-1">Total Registered Students</h6>
+                <h6 class="text-secondary mb-1">Total Students</h6>
                 <h3 class="fw-bold text-white mb-0"><?php echo $total_students; ?></h3>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card card-custom p-3 text-center border-start border-4 border-warning">
                 <i class="fa-solid fa-calendar-check fa-2x text-gold mb-2"></i>
-                <h6 class="text-secondary mb-1">Active Campus Events</h6>
+                <h6 class="text-secondary mb-1">Active Events</h6>
                 <h3 class="fw-bold text-white mb-0"><?php echo $total_events; ?></h3>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card card-custom p-3 text-center border-start border-4 border-warning">
                 <i class="fa-solid fa-ticket fa-2x text-gold mb-2"></i>
-                <h6 class="text-secondary mb-1">Total Event Registrations</h6>
+                <h6 class="text-secondary mb-1">Total Registrations</h6>
                 <h3 class="fw-bold text-white mb-0"><?php echo $total_regs; ?></h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-custom p-3 text-center border-start border-4 border-warning">
+                <i class="fa-solid fa-sack-dollar fa-2x text-gold mb-2"></i>
+                <h6 class="text-secondary mb-1">Total Revenue</h6>
+                <h3 class="fw-bold text-white mb-0">LKR <?php echo number_format($total_revenue, 2); ?></h3>
             </div>
         </div>
     </div>
 
-    <!-- Detailed Event Breakdown Table -->
-    <div class="card card-custom p-4">
+    <!-- Event Participation Breakdown Table -->
+    <div class="card card-custom p-4 mb-4">
         <h4 class="fw-bold text-gold mb-3"><i class="fa-solid fa-list-check me-2"></i>Event Participation Breakdown</h4>
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle border-secondary mb-0">
@@ -160,10 +185,42 @@ oci_execute($stmt);
             </table>
         </div>
     </div>
+
+    <!-- Recent Student Registrations Activity Log -->
+    <div class="card card-custom p-4">
+        <h4 class="fw-bold text-gold mb-3"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Registration Logs</h4>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle border-secondary mb-0">
+                <thead>
+                    <tr class="text-gold">
+                        <th>Reg ID</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Registered Event</th>
+                        <th>Registration Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($rec = oci_fetch_array($recent_stmt, OCI_ASSOC+OCI_RETURN_NULLS)): ?>
+                        <tr>
+                            <td><span class="badge bg-dark border border-secondary text-light">#<?php echo htmlspecialchars($rec['REGISTRATION_ID']); ?></span></td>
+                            <td><?php echo htmlspecialchars($rec['STUDENT_ID']); ?></td>
+                            <td class="fw-bold text-white"><?php echo htmlspecialchars($rec['STUDENT_NAME']); ?></td>
+                            <td><?php echo htmlspecialchars($rec['EVENT_TITLE']); ?></td>
+                            <td><?php echo date('M d, Y', strtotime($rec['REGISTRATION_DATE'])); ?></td>
+                            <td><span class="badge bg-success">REGISTERED</span></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <?php 
 oci_free_statement($stmt);
+oci_free_statement($recent_stmt);
 oci_close($conn);
 require_once 'views/footer.php'; 
 ?>
